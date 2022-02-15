@@ -1,0 +1,77 @@
+---
+title: "script"
+author: "Dariush"
+date: "2/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+#Reading datasets
+#Cosmetix Expenditure in 1399
+data1 <- read.csv("C:\\Users\\dghasemisemeskandeh\\Desktop\\NewData1.csv", header = TRUE, stringsAsFactors = FALSE, colClasses = )
+
+#Families general information
+data2 <- read.csv("C:\\Users\\dghasemisemeskandeh\\Desktop\\NewData2.csv", header = TRUE, stringsAsFactors = FALSE)
+
+#Families peoperties and utensiles
+data3 <- read.csv("C:\\Users\\dghasemisemeskandeh\\Desktop\\NewData3.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r}
+
+
+colnames(data1)[names(data1) == "ï..Category1"] <- "Category1"
+colnames(data2)[names(data2) == "ï..Category2"] <- "Category2"
+colnames(data3)[names(data3) == "ï..Category3"] <- "Category3"
+
+data1$Address <- as.character(data1$Address)
+data2$Address <- as.character(data2$Address)
+data3$Address <- as.character(data3$Address)
+
+```
+
+
+```{r}
+#finding ununique families' ID in different datasets
+setdiff(data1$Address[1:10], data2$Address[1:10])
+```
+```{r}
+Cosmetics1 <- merge(data1, data2, by = "Address", all = FALSE)
+Cosmetics2 <- merge(Cosmetics1, data3, by = "Address", all.x = TRUE, all.y = TRUE, )
+
+```
+
+```{r}
+#Number of unique observations in each datasets
+
+#Cosmetics1 = 31,942
+#data1 = 31,942
+#data2 = 37,520
+#data3 = 37,557
+
+length(unique(data2$Address))
+```
+```{r , echo=TRUE}
+library(tidyverse)
+
+Cosmetics2 %>%
+  mutate(Gender = ifelse(Sex == 1, "Male", "Female")) %>%
+  ggplot(aes(Gender, CosmeticExpenditure)) +
+  #geom_point(aes(color = Gender), alpha = 0.2)
+  geom_boxplot()+ theme_classic()
+  
+
+```
+
+
+
+
+
+
+
