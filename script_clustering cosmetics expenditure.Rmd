@@ -41,11 +41,6 @@ data3$Address <- as.character(data3$Address)
 #finding ununique families' ID in different datasets
 setdiff(data1$Address[1:10], data2$Address[1:10])
 ```
-```{r}
-Cosmetics1 <- merge(data1, data2, by = "Address", all = FALSE)
-Cosmetics2 <- merge(Cosmetics1, data3, by = "Address", all.x = TRUE, all.y = TRUE, )
-
-```
 
 ```{r}
 #Number of unique observations in each datasets
@@ -57,9 +52,39 @@ Cosmetics2 <- merge(Cosmetics1, data3, by = "Address", all.x = TRUE, all.y = TRU
 
 length(unique(data2$Address))
 ```
-```{r , echo=TRUE}
+
+```{r}
+head(data1)
+```
+```{r}
+data1 %>% count(CosmeticCode)
+
+data1_prep <- data1 %>%
+  group_by(Address) %>% 
+  summarise(SumCosExp = sum(CosmeticExpenditure))
+```
+
+```{r}
 library(tidyverse)
 
+#length(unique(data2[data2$FamilyMemberN > 6, "Address"]))
+#[1] 901
+
+data2_prep <- data2 %>% 
+  filter(FamilyMemberN < 7) %>%
+  pivot_wider(id_cols = c(Category2, Address), 
+                                    names_from = FamilyMemberN,
+                                    values_from = c(Dependency, Sex, Age, Eduaction, StillEduacating,                                                          Degree, OccupationStatus, MaritalStatus)) #names_glue = "{pheno}_{.value}"
+head(data2_prep)
+```
+```{r}
+#dataset for clustering
+merge(data1[,c("Category1", "Address")], data1_prep, by = "Address",  all.y = FALSE) %>% glimpse()
+
+cosdata <- merge(data2_prep, data1_prep, by = "Address")
+```
+
+```{r , echo=TRUE}
 Cosmetics2 %>%
   mutate(Gender = ifelse(Sex == 1, "Male", "Female")) %>%
   ggplot(aes(Gender, CosmeticExpenditure)) +
@@ -69,7 +94,16 @@ Cosmetics2 %>%
 
 ```
 
+```{r}
+library(pheatmap)
 
+cosdata %>% glimpse()
+cosdata %>% count(Category2)
+
+pheatmap(cor(cosdata[, -c(1:2)]))
+```
+
+str(cosdata)
 
 
 
